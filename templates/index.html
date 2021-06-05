@@ -1,0 +1,70 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gender Identification by Voice</title>
+</head>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<!--<script type="text/javascript">{% include "index.js" %}</script>-->
+
+<body style="background-color: #E0FFFF; padding-top: 100px">
+    <div class="container" style="background-color: #FFEBCD; text-align: center; border: 4px solid #fa2fd1; width: 40%; height: 80%; padding-top: 50px" >
+        <div>
+            <h1 style="text-align: center; padding-bottom:30px"> Gender Identification by Voice </h1>
+            <p>
+            <p>
+        </div>
+        <label for="audio_file" style="padding-bottom:30px">Upload your audio file(.wav only) here!</label>
+        <input class="btn btn-warning" type="file" id="audio_file" name="myfile" style="margin: 0 auto ">
+        <audio id="audio" controls style="margin-top: 50px">
+			<source src="" id="src" />
+		</audio>
+        <br>
+        <button class="btn btn-success" onclick="performAPI()" style="margin-top:50px"> Upload & Predict </button>
+        <br>
+        <!--<hr style="width:100%;text-align:left;margin-left:0">-->
+        <!--<hr style="width:100%;text-align:left;margin-left:0">-->
+        <div id="results" style="display: grid; grid-template-columns: repeat(5, 1fr); grid-gap:10px;"></div>
+		<br>
+    </div>
+	<script>
+	function performAPI() {
+		var files = document.getElementById("audio_file").files;
+		var formData = new FormData();
+		var endpoint = 'route_gender_svm';
+		formData.append('file', files[0])
+		$.ajax({
+			type: 'POST',
+			url: endpoint,
+			data: formData,
+			contentType: false,
+			cache: false,
+			processData: false,
+			success: function(data) {
+				console.log("Upload successful", data);
+				result = data.class_name;
+				swal("Prediction result:", result);
+			},
+			error: function(e) {
+				console.log("Upload failed", e);
+				swal("Can't predict. Make sure you upload the right file(.wav file, duration > 0.5s) and try again!");
+			}
+		});
+	}
+
+	function playAudio(){
+		var files = event.target.files;
+		console.log(files[0].type);
+		if(files[0].type == "audio/wav"){
+            		$("#src").attr("src", URL.createObjectURL(files[0]));
+            		document.getElementById("audio").load();
+		} else {
+		        $("#src").attr("src", "");
+                        document.getElementById("audio").load();
+		}
+	}
+	document.getElementById("audio_file").addEventListener("change", playAudio, false);
+	</script>
+</body>
